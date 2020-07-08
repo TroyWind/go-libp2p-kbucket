@@ -4,6 +4,8 @@ package kbucket
 
 import (
 	"container/list"
+	"github.com/libp2p/go-libp2p-kbucket/dlog/dlkbucketlog"
+	"go.uber.org/zap"
 	"time"
 
 	"github.com/libp2p/go-libp2p-core/peer"
@@ -116,6 +118,7 @@ func (b *bucket) moveToFront(id peer.ID) {
 }
 
 func (b *bucket) pushFront(p *PeerInfo) {
+	dlkbucketlog.L.Debug("kbucket pushFront", zap.Any("p", p.Id))
 	b.list.PushFront(p)
 }
 

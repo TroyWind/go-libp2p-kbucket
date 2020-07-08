@@ -322,12 +322,12 @@ func (rt *RoutingTable) NearestPeer(id ID) peer.ID {
 
 // NearestPeers returns a list of the 'count' closest peers to the given ID
 func (rt *RoutingTable) NearestPeers(id ID, count int) []peer.ID {
-	dlkbucketlog.L.Debug("NearestPeers", zap.Any("to find peer", id), zap.Any("count", count), zap.Any("buckets len", len(rt.buckets)))
 	// This is the number of bits _we_ share with the key. All peers in this
 	// bucket share cpl bits with us and will therefore share at least cpl+1
 	// bits with the given key. +1 because both the target and all peers in
 	// this bucket differ from us in the cpl bit.
 	cpl := CommonPrefixLen(id, rt.local)
+	dlkbucketlog.L.Debug("NearestPeers", zap.Any("to find peer", id), zap.Any("count", count), zap.Any("buckets len", len(rt.buckets)), zap.Any("cpl", cpl))
 
 	// It's assumed that this also protects the buckets.
 	rt.tabLock.RLock()
@@ -358,6 +358,7 @@ func (rt *RoutingTable) NearestPeers(id ID, count int) []peer.ID {
 			pds.appendPeersFromList(rt.buckets[i].list)
 		}
 	}
+	dlkbucketlog.L.Debug("NearestPeers2", zap.Any("pds.Len()", pds.Len()))
 
 	// If we're still short, add in buckets that share _fewer_ bits. We can
 	// do this bucket by bucket because each bucket will share 1 fewer bit
@@ -374,6 +375,7 @@ func (rt *RoutingTable) NearestPeers(id ID, count int) []peer.ID {
 	// Sort by distance to local peer
 	pds.sort()
 
+	dlkbucketlog.L.Debug("NearestPeers3", zap.Any("pds.Len()", pds.Len()), zap.Any("count", count))
 	if count < pds.Len() {
 		pds.peers = pds.peers[:count]
 	}

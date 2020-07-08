@@ -2,6 +2,8 @@ package kbucket
 
 import (
 	"container/list"
+	"github.com/libp2p/go-libp2p-kbucket/dlog/dlkbucketlog"
+	"go.uber.org/zap"
 	"sort"
 
 	"github.com/libp2p/go-libp2p-core/peer"
@@ -37,7 +39,9 @@ func (pds *peerDistanceSorter) appendPeer(p peer.ID, pDhtId ID) {
 
 // Append the peer.ID values in the list to the sorter's slice. It may no longer be sorted.
 func (pds *peerDistanceSorter) appendPeersFromList(l *list.List) {
+	dlkbucketlog.L.Debug("appendPeersFromList", zap.Any("l len", l.Len()))
 	for e := l.Front(); e != nil; e = e.Next() {
+		dlkbucketlog.L.Debug("appendPeersFromList", zap.Any("dhtId", e.Value.(*PeerInfo).dhtId))
 		pds.appendPeer(e.Value.(*PeerInfo).Id, e.Value.(*PeerInfo).dhtId)
 	}
 }
