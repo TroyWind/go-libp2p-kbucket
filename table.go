@@ -5,6 +5,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/libp2p/go-libp2p-kbucket/dlog/dlkbucketlog"
+	"go.uber.org/zap"
 	"sync"
 	"time"
 
@@ -134,6 +136,7 @@ func (rt *RoutingTable) TryAddPeer(p peer.ID, queryPeer bool) (bool, error) {
 
 // locking is the responsibility of the caller
 func (rt *RoutingTable) addPeer(p peer.ID, queryPeer bool) (bool, error) {
+	dlkbucketlog.L.Debug("kbucket RoutingTable addPeer", zap.Any("p", p))
 	bucketID := rt.bucketIdForPeer(p)
 	bucket := rt.buckets[bucketID]
 	var lastUsefulAt time.Time
@@ -319,6 +322,7 @@ func (rt *RoutingTable) NearestPeer(id ID) peer.ID {
 
 // NearestPeers returns a list of the 'count' closest peers to the given ID
 func (rt *RoutingTable) NearestPeers(id ID, count int) []peer.ID {
+	dlkbucketlog.L.Debug("NearestPeers", zap.Any("to find peer", id), zap.Any("count", count), zap.Any("buckets len", len(rt.buckets)))
 	// This is the number of bits _we_ share with the key. All peers in this
 	// bucket share cpl bits with us and will therefore share at least cpl+1
 	// bits with the given key. +1 because both the target and all peers in
